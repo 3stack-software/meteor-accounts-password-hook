@@ -1,4 +1,3 @@
-
 var afterCreateUserHook = null;
 
 Accounts.afterCreateUser = function(func) {
@@ -9,10 +8,12 @@ Accounts.afterCreateUser = function(func) {
   }
 };
 
+var oldCreateUser = Meteor.server.method_handlers.createUser;
+delete Meteor.server.method_handlers.createUser;
+
 Meteor.methods({
-  createUserWithHook: function(options) {
-    var loginToken;
-    loginToken = Meteor.call('createUser', options);
+  "createUser": function(options) {
+    var loginToken = oldCreateUser.call(this, options);
     if (afterCreateUserHook) {
       afterCreateUserHook(loginToken.id);
     }
